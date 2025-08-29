@@ -85,10 +85,7 @@ class PowerHarness {
         # welcome everyone
         #------------------------------------------------------------------------------------------
         $this.Logger.Info("======")
-        $this.Logger.Info("======")
-        $this.Logger.Info("======")
-        $this.Logger.Info("====== $($this.ScriptName) $timestamp ============")
-        $this.Logger.Info("====== PowerHarness v$version")
+        $this.Logger.Info("====== $($this.ScriptName) - PowerHarness v$version =============================")
 
         #------------------------------------------------------------------------------------------
         # do the actual work we came here to do
