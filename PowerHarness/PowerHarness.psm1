@@ -114,7 +114,7 @@ class PowerHarness {
                 } else {
                     $body = $bodyContent
                 }
-                $to = $cfg.emailConfig.notifyEmail
+                $to = $cfg.notifyEmail
                 if ($to) {
                     try {
                         $this.Emailer.Send($subject, $body, $to)
