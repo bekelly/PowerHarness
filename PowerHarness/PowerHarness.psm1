@@ -33,6 +33,7 @@ class PowerHarness {
         #------------------------------------------------------------------------------------------
         # initialization and welcome
         #------------------------------------------------------------------------------------------
+        $version = "0.9.2"
         $timestamp = Get-Date -Format "yyyy-MM-dd hh:mm:ss tt"
         Write-Host "Initializing PowerHarness for $($this.ScriptName) [$timestamp]"
         Write-Host "Script path: $($this.ScriptRoot)"
@@ -86,7 +87,8 @@ class PowerHarness {
         $this.Logger.Info("======")
         $this.Logger.Info("======")
         $this.Logger.Info("======")
-        $this.Logger.Info("====== $($this.ScriptName) $timestamp ======")
+        $this.Logger.Info("====== $($this.ScriptName) $timestamp ============")
+        $this.Logger.Info("====== PowerHarness v$version")
 
         #------------------------------------------------------------------------------------------
         # do the actual work we came here to do
@@ -106,12 +108,14 @@ class PowerHarness {
                 $logHtml = $this.Logger.GetHtmlLog()
                 $subject = "$($this.ScriptName) error report [$timestamp]"
                 $bodyContent = "<div class='code'>$logHtml</div>"
-                $templatePath = Join-Path $this.ScriptRoot 'ph/res/NotificationEmailTemplate.html'
+                $templatePath = Join-Path $this.ScriptRoot "tpl/$($this.Config.notificationTemplate)"
+                $this.Logger.Debug("Using notification template at $templatePath")
                 if (Test-Path $templatePath) {
                     $template = Get-Content $templatePath -Raw
                     $body = $template -replace '%message%', [System.Text.RegularExpressions.Regex]::Escape($bodyContent) -replace '\\n', "`n"
                     $body = $template -replace '%message%', $bodyContent
                 } else {
+                    $this.Logger.Info("Notification template not found at $templatePath, using raw log content.")
                     $body = $bodyContent
                 }
                 $to = $cfg.notifyEmail
