@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+
+    {
+      "type": "PowerShell",
+      "request": "launch",
+      "name": "PowerHarness Debug Launcher",
+
+      // Always use forward-slashes; script must be a real .ps1 file
+      "script": "${workspaceFolder}/PowerHarnessDebug.ps1",
+
+      // Pass the currently open file as the single positional parameter
+      "args": [
+        "${file}"
+      ],
+
+      // Must be a folder—point back at the root of your module/repo
+      "cwd": "${workspaceFolder}"
+    }
+
+  ]
+}
