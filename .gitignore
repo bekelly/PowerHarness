@@ -1,0 +1,10 @@
+# PowerShell artifacts
+*.psd1
+*.psm1.psd1
+# VS Code workspace settings
+.vscode/
+# OS temp files
+Thumbs.db
+.DS_Store
+# OneDrive sync metadata
+~$*
