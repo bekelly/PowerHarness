@@ -2,6 +2,15 @@
 PowerHarness is a framework for allowing PowerShell scripts to be written quickly but including a robust, standardized feature set, including logging, email, and other capabilities.
 # Installation
 PowerHarness is not currently in any package manager.  You can simply copy the PowerHarness folder to your script directory.
+```powershell
+$ErrorActionPreference = 'Stop'
+Import-Module "$PSScriptRoot\PowerHarness\PowerHarness.psm1"
+$ph = Get-PowerHarness -scriptPath $MyInvocation.MyCommand.Path
+
+$ph.RunScript({
+  $ph.Logger.Info("Hello World!")
+})
+```
 ## Directory Structure
 ```
 📂 My Project
