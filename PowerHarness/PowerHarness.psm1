@@ -33,7 +33,7 @@ class PowerHarness {
         #------------------------------------------------------------------------------------------
         # initialization and welcome
         #------------------------------------------------------------------------------------------
-        $version = "0.9.2"
+        $version = "0.9.3"
         $timestamp = Get-Date -Format "yyyy-MM-dd hh:mm:ss tt"
         Write-Host "Initializing PowerHarness for $($this.ScriptName) [$timestamp]"
         Write-Host "Script path: $($this.ScriptRoot)"
@@ -85,6 +85,56 @@ class PowerHarness {
         # welcome everyone
         #------------------------------------------------------------------------------------------
         $this.Logger.Info("====== $($this.ScriptName) - PowerHarness v$version =============================")
+
+        #------------------------------------------------------------------------------------------
+        # if we're supposed to log the config, go ahead and do that now
+        #------------------------------------------------------------------------------------------
+        if ($this.Config.logConfiguration) {
+            
+            function LogConfigObject($obj, $logger) {
+                if ($null -eq $obj) {
+                    Write-Host "Object is NULL" -ForegroundColor Red
+                    return
+                }
+                if ($null -eq $logger)
+                { 
+                    Write-Host "Logger is NULL" -ForegroundColor Red
+                    return
+                }
+                foreach ($property in $obj.PSObject.Properties) {
+                    if ($property.Value -is [PSCustomObject] -or $property.Value -is [hashtable]) {
+                        $logger.Info("$($property.Name):")
+                        $logger.IndentIncrease()
+                        LogConfigObject $property.Value $logger
+                        $logger.IndentDecrease()
+                    } elseif ($property.Value -is [System.Collections.IEnumerable] -and
+                              -not ($property.Value -is [string])) {
+                        $logger.Info("$($property.Name):")
+                        $logger.IndentIncrease()
+                        foreach ($item in $property.Value) {
+                            if ($item -is [PSCustomObject] -or $item -is [hashtable]) {
+                                LogConfigObject $item $logger
+                            } else {
+                                $logger.Info("$item")
+                            }
+                        }
+                        $logger.IndentDecrease()
+                    } else {
+                        $value = $property.Value
+                        if ($property.Name -in @('password', 'apiKey')) {
+                            $value = '*' * ($property.Value.ToString().Length)
+                        }
+                        $logger.Info("$($property.Name): $value")
+                    }
+                }
+            }
+            $this.Logger.Info("")
+            $this.Logger.Info("Script configuration:")
+            $this.Logger.IndentIncrease()
+            LogConfigObject $this.Config $this.Logger
+            $this.Logger.IndentDecrease()
+            $this.Logger.Info("")
+        }
 
         #------------------------------------------------------------------------------------------
         # do the actual work we came here to do
