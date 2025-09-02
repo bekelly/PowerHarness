@@ -131,4 +131,43 @@ class phUtil {
 
     }
 
+    [void] LogObject ([PSCustomObject]$obj, [PSCustomObject]$logger) {
+
+        if ($null -eq $logger) { 
+            Write-Host "Logger is NULL" -ForegroundColor Red
+            return
+        }
+
+        if ($null -eq $obj) {
+            $logger.Info("Object to log is null.")
+            return
+        }
+
+        foreach ($property in $obj.PSObject.Properties) {
+            if ($property.Value -is [PSCustomObject] -or $property.Value -is [hashtable]) {
+                $logger.Info("$($property.Name):")
+                $logger.IndentIncrease()
+                $this.LogObject($property.Value, $logger)
+                $logger.IndentDecrease()
+            } elseif ($property.Value -is [System.Collections.IEnumerable] -and -not ($property.Value -is [string])) {
+                $logger.Info("$($property.Name):")
+                $logger.IndentIncrease()
+                foreach ($item in $property.Value) {
+                    if ($item -is [PSCustomObject] -or $item -is [hashtable]) {
+                        $this.LogObject($item, $logger)
+                    } else {
+                        $logger.Info("$item")
+                    }
+                }
+                $logger.IndentDecrease()
+            } else {
+                $value = $property.Value
+                if ($property.Name -in @('password', 'apiKey')) {
+                    $value = '*' * ($property.Value.ToString().Length)
+                }
+                $logger.Info("$($property.Name): $value")
+            }
+        }
+    }
+
 }
