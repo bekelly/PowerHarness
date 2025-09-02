@@ -5,6 +5,7 @@ class phLogger {
     [int]$ErrorCount = 0
     [System.Text.StringBuilder]$HtmlLog
     [int]$IndentLevel = 0
+    [string]$IndentStr = "  "
 
     phLogger([PSCustomObject]$config) {
         $this.Config = $config
@@ -40,7 +41,7 @@ class phLogger {
     hidden [void]Log([string]$Level, [string]$Message) {
 
         $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
-        $indentText = " " * ($this.IndentLevel * 2)
+        $indentText = $this.IndentStr * ($this.IndentLevel)
         $levelPadded = "$Level".PadLeft(5)
         $logLine = "$timestamp [$levelPadded] $indentText$Message"
 
@@ -51,7 +52,7 @@ class phLogger {
             } elseif ($Level -eq 'DEBUG') {
                 Write-Host $logLine -ForegroundColor Cyan
             } else {
-                Write-Host $logLine   
+                Write-Host $logLine
             }
         }
 
@@ -95,5 +96,13 @@ class phLogger {
         if ($this.IndentLevel -gt 0) {
             $this.IndentLevel--
         }
+    }
+
+    [void] SetIndentStr([string]$str) {
+        $this.IndentStr = $str
+    }
+
+    [void] ResentIndentStr() {
+        $this.IndentStr = "  "
     }
 }
