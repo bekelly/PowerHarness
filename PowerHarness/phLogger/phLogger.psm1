@@ -4,6 +4,7 @@ class Logger {
     [PSCustomObject]$Config
     [int]$ErrorCount = 0
     [System.Text.StringBuilder]$HtmlLog
+    [int]$IndentLevel = 0
 
     Logger([PSCustomObject]$config) {
         $this.Config = $config
@@ -37,8 +38,11 @@ class Logger {
     }
 
     hidden [void]Log([string]$Level, [string]$Message) {
+
         $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
-        $logLine = "$timestamp [$Level] $Message"
+        $indentText = " " * ($this.IndentLevel * 2)
+        $levelPadded = "$Level".PadLeft(5)
+        $logLine = "$timestamp [$levelPadded] $indentText$Message"
 
         # Console output (only if enabled in config)
         if ($this.Config.consoleLogEnabled) {
@@ -81,5 +85,15 @@ class Logger {
 
     [string] GetHtmlLog() {
         return $this.HtmlLog.ToString()
+    }
+
+    [void] IndentIncrease() {
+        $this.IndentLevel++
+    }
+
+    [void] IndentDecrease() {
+        if ($this.IndentLevel -gt 0) {
+            $this.IndentLevel--
+        }
     }
 }
