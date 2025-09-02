@@ -1,10 +1,10 @@
 $ErrorActionPreference = 'Stop'
 
-class Emailer {
+class phEmailer {
     [System.Net.Mail.SmtpClient] $SmtpClient
     [System.Net.Mail.MailAddress] $FromAddress
 
-    Emailer([PSCustomObject]$config) {
+    phEmailer([PSCustomObject]$config) {
         $this.SmtpClient = [System.Net.Mail.SmtpClient]::new($config.smtpServer, $config.smtpPort)
         $this.SmtpClient.EnableSsl = $true
         $this.SmtpClient.Credentials = [System.Net.NetworkCredential]::new($config.username, $config.password)

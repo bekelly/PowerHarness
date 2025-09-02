@@ -1,12 +1,12 @@
 $ErrorActionPreference = 'Stop'
 
-class Logger {
+class phLogger {
     [PSCustomObject]$Config
     [int]$ErrorCount = 0
     [System.Text.StringBuilder]$HtmlLog
     [int]$IndentLevel = 0
 
-    Logger([PSCustomObject]$config) {
+    phLogger([PSCustomObject]$config) {
         $this.Config = $config
         $this.HtmlLog = [System.Text.StringBuilder]::new()
 

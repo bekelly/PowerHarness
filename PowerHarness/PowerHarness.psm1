@@ -9,17 +9,18 @@
 # It provides a structured way to execute scripts, log their output, and send notifications on
 # errors.
 #--------------------------------------------------------------------------------------------------
-using module ".\phUtil\phUtil.psm1"
-using module ".\phLogger\phLogger.psm1"
-using module ".\phEmailer\phEmailer.psm1"
+using module ".\lib\phUtil.psm1"
+using module ".\lib\phLogger.psm1"
+using module ".\lib\phEmailer.psm1"
+using module ".\lib\phSQL.psm1"
 $ErrorActionPreference = 'Stop'
 
 class PowerHarness {
     [string]$ScriptName
     [string]$ScriptRoot
     [object]$Config
-    [Logger]$Logger
-    [Emailer]$Emailer
+    [phLogger]$Logger
+    [phEmailer]$Emailer
     [phUtil]$Util
 
     PowerHarness([string]$scriptPath) {
@@ -78,8 +79,8 @@ class PowerHarness {
         #------------------------------------------------------------------------------------------
         # initialize subsystems
         #------------------------------------------------------------------------------------------
-        $this.Logger = [Logger]::new($cfg.logger)
-        $this.Emailer = [Emailer]::new($cfg.emailer)
+        $this.Logger = [phLogger]::new($cfg.logger)
+        $this.Emailer = [phEmailer]::new($cfg.emailer)
 
         #------------------------------------------------------------------------------------------
         # welcome everyone
