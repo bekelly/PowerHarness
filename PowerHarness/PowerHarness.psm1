@@ -22,6 +22,7 @@ class PowerHarness {
     [phLogger]$Logger
     [phEmailer]$Emailer
     [phUtil]$Util
+    [phSQL]$SQL
 
     PowerHarness([string]$scriptPath) {
         $this.ScriptName = [System.IO.Path]::GetFileName($scriptPath)
@@ -81,6 +82,7 @@ class PowerHarness {
         #------------------------------------------------------------------------------------------
         $this.Logger = [phLogger]::new($cfg.logger)
         $this.Emailer = [phEmailer]::new($cfg.emailer)
+        $this.SQL = [phSQL]::new($this.Logger)
 
         #------------------------------------------------------------------------------------------
         # welcome everyone

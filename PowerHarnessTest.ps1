@@ -16,4 +16,9 @@ $ph.RunScript({
     $ph.Logger.Info("Back to previous indent level.")
     $ph.Logger.IndentDecrease()
     $ph.Logger.Error("This is a sample error message")
+
+    $ph.SQL.SetConnection($ph.Config.sqlConnection)
+    $accountList = $ph.SQL.ExecReaderToHtmlTable("SELECT * FROM dbo.Account")
+    $ph.Emailer.Send("Test email from PowerHarness", $accountList, $ph.Config.notifyEmail)
+
 })
