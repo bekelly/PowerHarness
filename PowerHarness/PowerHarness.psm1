@@ -31,11 +31,11 @@ class PowerHarness {
     }
 
     [void] RunScript([ScriptBlock]$MainFunction) {
-        
+
         #------------------------------------------------------------------------------------------
         # initialization and welcome
         #------------------------------------------------------------------------------------------
-        $version = "0.9.3"
+        $version = "0.9.4"
         $timestamp = Get-Date -Format "yyyy-MM-dd hh:mm:ss tt"
         Write-Host "Initializing PowerHarness for $($this.ScriptName) [$timestamp]"
         Write-Host "Script path: $($this.ScriptRoot)"
