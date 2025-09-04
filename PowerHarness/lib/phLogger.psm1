@@ -43,10 +43,12 @@ class phLogger {
         $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
         $indentText = $this.IndentStr * ($this.IndentLevel)
         $levelPadded = "$Level".PadLeft(5)
-        $logLine = "$timestamp [$levelPadded] $indentText$Message"
 
-        # Console output (only if enabled in config)
-        if ($this.Config.consoleLogEnabled) {
+        foreach ($line in $Message -split "`r?`n") {
+            $logLine = "$timestamp [$levelPadded] $indentText$line"
+
+            # Console output (only if enabled in config)
+            if ($this.Config.consoleLogEnabled) {
             if ($Level -eq 'ERROR') {
                 Write-Host $logLine -ForegroundColor Red
             } elseif ($Level -eq 'DEBUG') {
@@ -54,16 +56,17 @@ class phLogger {
             } else {
                 Write-Host $logLine
             }
-        }
+            }
 
-        # File output
-        if ($this.Config.fileLogEnabled) {
+            # File output
+            if ($this.Config.fileLogEnabled) {
             Add-Content -Path $this.Config.LogPath -Value $logLine
-        }
+            }
 
-        # HTML log accumulation
-        $escaped = [System.Net.WebUtility]::HtmlEncode($logLine)
-        $this.HtmlLog.AppendLine("<div class='log-$($Level.ToLower())'>$escaped</div>") | Out-Null
+            # HTML log accumulation
+            $escaped = [System.Net.WebUtility]::HtmlEncode($logLine)
+            $this.HtmlLog.AppendLine("<div class='log-$($Level.ToLower())'>$escaped</div>") | Out-Null
+        }
 
         if ($Level -eq 'ERROR') {
             $this.ErrorCount++

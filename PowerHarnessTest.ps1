@@ -11,7 +11,7 @@ $ph.RunScript({
     $ph.Logger.IndentIncrease()
     $ph.Logger.Info("This is an indented info message.")
     $ph.Logger.IndentIncrease()
-    $ph.Logger.Info("This is a more indented info message.")
+    $ph.Logger.Info("This is a more indented info message.`nIt's also a log statement with multiple lines.`nLine 3.`nLine 4.")
     $ph.Logger.IndentDecrease()
     $ph.Logger.Info("Back to previous indent level.")
     $ph.Logger.IndentDecrease()
