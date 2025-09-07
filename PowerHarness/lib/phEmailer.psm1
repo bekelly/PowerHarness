@@ -32,4 +32,39 @@ class phEmailer {
     [void] Send([string]$Subject, [string]$Body, [string]$ToAddress) {
         $this.Send($Subject, $Body, $ToAddress, @())
     }
+
+    [string] ApplyTemplate([string]$templatePath, [hashtable]$placeholders) {
+
+        #------------------------------------------------------------------------------------------
+        # validate the template path
+        #------------------------------------------------------------------------------------------
+        if (-not (Test-Path $templatePath)) {
+            throw "Template file not found: $templatePath"
+        }
+
+        #------------------------------------------------------------------------------------------
+        # load the file
+        #------------------------------------------------------------------------------------------
+        $templateContent = Get-Content -Path $templatePath -Raw
+
+        #------------------------------------------------------------------------------------------
+        # do the replacements
+        #------------------------------------------------------------------------------------------
+        foreach ($key in $placeholders.Keys) {
+            $placeholder = "%$key%"
+            $value = $placeholders[$key]
+            $templateContent = $templateContent.Replace($placeholder, $value)
+        }
+
+        #------------------------------------------------------------------------------------------
+        # give 'em what we've got
+        #------------------------------------------------------------------------------------------
+        return $templateContent
+
+    }
+
+    [string] ApplyDefaultTemplate([string]$bodyContent) {
+        $templatePath = Join-Path $PSScriptRoot "../resources/NotificationEmailTemplate.html"
+        return $this.ApplyTemplate($templatePath, @{ message = $bodyContent })
+    }
 }

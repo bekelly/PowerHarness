@@ -129,17 +129,8 @@ class PowerHarness {
                 $logHtml = $this.Logger.GetHtmlLog()
                 $subject = "$($this.ScriptName) error report [$timestamp]"
                 $bodyContent = "<div class='code'>$logHtml</div>"
-                $templatePath = Join-Path $this.ScriptRoot "tpl/$($this.Config.notificationTemplate)"
-                $this.Logger.Debug("Using notification template at $templatePath")
-                if (Test-Path $templatePath) {
-                    $template = Get-Content $templatePath -Raw
-                    $body = $template -replace '%message%', [System.Text.RegularExpressions.Regex]::Escape($bodyContent) -replace '\\n', "`n"
-                    $body = $template -replace '%message%', $bodyContent
-                } else {
-                    $this.Logger.Info("Notification template not found at $templatePath, using raw log content.")
-                    $body = $bodyContent
-                }
-                $to = $cfg.notifyEmail
+                $body = $this.Emailer.ApplyDefaultTemplate($bodyContent)
+                $to = $this.Config.notifyEmail
                 if ($to) {
                     try {
                         $this.Emailer.Send($subject, $body, $to)

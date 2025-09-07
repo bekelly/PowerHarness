@@ -19,5 +19,9 @@ $ph.RunScript({
 
     $ph.SQL.SetConnection($ph.Config.sqlConnection)
     $accountList = $ph.SQL.ExecReaderToHtmlTable("SELECT * FROM dbo.Account")
-    $ph.Emailer.Send("Test email from PowerHarness", $accountList, $ph.Config.notifyEmail)
+    # $ph.Logger.Debug($accountList)
+    $body = $ph.emailer.ApplyDefaultTemplate($accountList)
+    # $ph.Logger.Debug($body)
+    # Write-Host $body
+    $ph.Emailer.Send("Test email from PowerHarness", $body, $ph.Config.notifyEmail)
 })
