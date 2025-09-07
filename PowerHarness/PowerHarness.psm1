@@ -33,9 +33,19 @@ class PowerHarness {
     [void] RunScript([ScriptBlock]$MainFunction) {
 
         #------------------------------------------------------------------------------------------
+        # just who do we think we are? (get the current version number)
+        #------------------------------------------------------------------------------------------
+        $version = "?.?.?.?"
+        try {
+            $moduleInfo = Get-InstalledModule PowerHarness -ErrorAction Stop
+            $version = $moduleInfo.Version
+        } catch {
+            $version = "Unknown Version"
+        }
+
+        #------------------------------------------------------------------------------------------
         # initialization and welcome
         #------------------------------------------------------------------------------------------
-        $version = "0.9.4"
         $timestamp = Get-Date -Format "yyyy-MM-dd hh:mm:ss tt"
         Write-Host "Initializing PowerHarness for $($this.ScriptName) [$timestamp]"
         Write-Host "Script path: $($this.ScriptRoot)"
