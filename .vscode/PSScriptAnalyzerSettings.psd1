@@ -1,0 +1,7 @@
+@{
+    Rules = @{
+        TypeNotFound = @{
+            Severity = 'Ignore'
+        }
+    }
+}
