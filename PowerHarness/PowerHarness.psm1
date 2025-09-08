@@ -35,20 +35,14 @@ class PowerHarness {
         #------------------------------------------------------------------------------------------
         # just who do we think we are? (get the current version number)
         #------------------------------------------------------------------------------------------
-        $version = "?.?.?.?"
-        try {
-            $moduleInfo = Get-InstalledModule PowerHarness -ErrorAction Stop
-            $version = $moduleInfo.Version
-        } catch {
-            $version = "Unknown Version"
-        }
+        $version = $this.GetCurrentVersion()
 
         #------------------------------------------------------------------------------------------
         # initialization and welcome
         #------------------------------------------------------------------------------------------
         $timestamp = Get-Date -Format "yyyy-MM-dd hh:mm:ss tt"
-        Write-Host "Initializing PowerHarness for $($this.ScriptName) [$timestamp]"
-        Write-Host "Script path: $($this.ScriptRoot)"
+        # Write-Host "Initializing PowerHarness for $($this.ScriptName) [$timestamp]"
+        # Write-Host "Script path: $($this.ScriptRoot)"
 
         #------------------------------------------------------------------------------------------
         # get paths all set up
@@ -145,6 +139,45 @@ class PowerHarness {
         } else {
             $this.Logger.Info("Error notifications are disabled for this script.")
         }
+    }
+
+    #----------------------------------------------------------------------------------------------
+    # GetCurrentVersion
+    #
+    # reads the current version of PowerHarness from the installed module or the psd1 file
+    # (this is massively over-engineered, but it makes me happy)
+    #----------------------------------------------------------------------------------------------
+    [string] GetCurrentVersion() {
+
+        $version = "?.?.?.?"
+        try {
+            $moduleInfo = Get-InstalledModule PowerHarness -ErrorAction Stop
+            $version = $moduleInfo.Version
+        } catch {
+            try {
+                $psd1Path = Join-Path $PSScriptRoot "PowerHarness.psd1"
+                if (Test-Path $psd1Path) {
+                    try {
+                        $psd1Content = Get-Content $psd1Path -Raw
+                        if ($psd1Content -match "ModuleVersion\s*=\s*'([^']+)'") {
+                            $version = $matches[1]
+                        } else {
+                            $version = "Unknown Version"
+                        }
+                    } catch {
+                        $version = "Unknown Version"
+                    }
+                }
+                else {
+                    $version = "Unknown Version"
+                }
+            } catch {
+                $version = "Unknown Version"
+            }
+        }
+
+        return $version
+
     }
 }
 
