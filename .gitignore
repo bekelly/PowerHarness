@@ -6,4 +6,5 @@ Thumbs.db
 # local logs
 /log/
 /cfg/
+/bek/
 Publish-PowerHarness.ps1
