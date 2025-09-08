@@ -7,27 +7,54 @@ class phLogger {
     [int]$IndentLevel = 0
     [string]$IndentStr = "  "
 
+    [void] WriteToConsole([string]$message) {
+        if ($this.Config.writeConfigToConsole)
+        {
+            Write-Host $message
+        }
+    }
+
     phLogger([PSCustomObject]$config) {
+
+        #------------------------------------------------------------------------------------------
+        # initialize our bits
+        #------------------------------------------------------------------------------------------
         $this.Config = $config
         $this.HtmlLog = [System.Text.StringBuilder]::new()
 
-        Write-Host "phLogger: Log Path = '$($this.Config.LogPath)'"
-        Write-Host "phLogger: Debug Enabled = $($this.Config.DebugEnabled)"
-        Write-Host "phLogger: File Logging Enabled = $($this.Config.fileLogEnabled)"
-        Write-Host "phLogger: Console Logging Enabled = $($this.Config.consoleLogEnabled)"
+        #------------------------------------------------------------------------------------------
+        # log configuration values (if enabled)
+        #------------------------------------------------------------------------------------------
+        $this.WriteToConsole("phLogger: Log Path = '$($this.Config.LogPath)'")
+        $this.WriteToConsole("phLogger: Debug Enabled = $($this.Config.DebugEnabled)")
+        $this.WriteToConsole("phLogger: File Logging Enabled = $($this.Config.fileLogEnabled)")
+        $this.WriteToConsole("phLogger: Console Logging Enabled = $($this.Config.consoleLogEnabled)")
 
-        # Detect if LogPath is relative
+        #------------------------------------------------------------------------------------------
+        # detect if LogPath is relative
+        #------------------------------------------------------------------------------------------
         if (-not [System.IO.Path]::IsPathRooted($this.Config.LogPath)) {
-            Write-Host "phLogger: Log Path is relative, converting to absolute path."
+            $this.WriteToConsole("phLogger: Log Path is relative, converting to absolute path.")
             $this.Config.LogPath = Join-Path $PSScriptRoot $this.Config.LogPath
-            Write-Host "phLogger: Log Path is now '$($this.Config.LogPath)'"
+            $this.WriteToConsole("phLogger: Log Path is now '$($this.Config.LogPath)'")
         }
 
-        # Trim log if oversized
+        #------------------------------------------------------------------------------------------
+        # if the log path doesn't exist, try to create it
+        #------------------------------------------------------------------------------------------
+        $logDir = [System.IO.Path]::GetDirectoryName($this.Config.LogPath)
+        if (-not (Test-Path $logDir)) {
+            $this.WriteToConsole("phLogger: Log directory '$logDir' does not exist, creating it.")
+            New-Item -ItemType Directory -Path $logDir | Out-Null
+        }
+
+        #------------------------------------------------------------------------------------------
+        # trim log if oversized
+        #------------------------------------------------------------------------------------------
         if (Test-Path $this.Config.LogPath) {
             $currentSize = (Get-Item $this.Config.LogPath).length / 1024
             if ($currentSize -gt $this.Config.MaxSizeKB) {
-                Write-Host "phLogger: Log file exceeds max size of $($this.Config.MaxSizeKB)KB, trimming."
+                $this.WriteToConsole("phLogger: Log file exceeds max size of $($this.Config.MaxSizeKB)KB, trimming.")
                 $lines = Get-Content $this.Config.LogPath
                 while ($currentSize -gt $this.Config.MaxSizeKB -and $lines.Count -gt 0) {
                     $lines = $lines[1..($lines.Count - 1)]
