@@ -13,6 +13,37 @@ class phSQL {
         $this.ConnectionParams = $connectionParams
     }
 
+    [void] ExecNonQuery([string]$sqlCommand) {
+        $connectionString = "Server={0};Database={1};User Id={2};Password={3}" -f `
+            $this.ConnectionParams.server, `
+            $this.ConnectionParams.database, `
+            $this.ConnectionParams.username, `
+            $this.ConnectionParams.password
+
+        $connection = $null
+
+        try {
+            $connection = New-Object System.Data.SqlClient.SqlConnection
+            $connection.ConnectionString = $connectionString
+            $connection.Open()
+
+            $command = $connection.CreateCommand()
+            $command.CommandText = $sqlCommand
+            $rowsAffected = $command.ExecuteNonQuery()
+
+            $this.Logger.Info("SQL ExecNonQuery completed. Rows affected: $rowsAffected")
+        }
+        catch {
+            $this.Logger.Error("SQL ExecNonQuery error: $_")
+            throw
+        }
+        finally {
+            if ($connection -and $connection.State -eq 'Open') {
+                $connection.Close()
+            }
+        }
+    }
+
     [System.Data.DataTable] ExecReaderToDataTable([string]$sqlCommand) {
 
         $connectionString = "Server={0};Database={1};User Id={2};Password={3}" -f `
