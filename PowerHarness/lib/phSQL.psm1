@@ -3,17 +3,32 @@ $ErrorActionPreference = 'Stop'
 
 class phSQL {
     [phLogger]       $Logger
+    [PSCustomObject] $Config
     [PSCustomObject] $ConnectionParams
 
-    phSQL([phLogger]$logger){
+    phSQL([PSCustomObject]$config, [phLogger]$logger){
+        $this.Config = $config
         $this.Logger = $logger
     }
 
     [void] SetConnection([PSCustomObject]$connectionParams){
         $this.ConnectionParams = $connectionParams
+        $this.DebugLog("SetConnection:")
+        $this.DebugLog("Server Name: $($this.ConnectionParams.server)")
+        $this.DebugLog("   Database: $($this.ConnectionParams.database)")
+        $this.DebugLog("   Username: $($this.ConnectionParams.username)")
+        $masked = '*' * ($this.ConnectionParams.password.Length)
+        $this.DebugLog("   Password: $masked")
+    }
+
+    hidden [void] DebugLog([string]$message) {
+        if ($this.Config.debugLogEnabled) {
+            $this.Logger.Debug("SQL > $message")
+        }
     }
 
     [void] ExecNonQuery([string]$sqlCommand) {
+
         $connectionString = "Server={0};Database={1};User Id={2};Password={3}" -f `
             $this.ConnectionParams.server, `
             $this.ConnectionParams.database, `
@@ -22,16 +37,20 @@ class phSQL {
 
         $connection = $null
 
+        $this.DebugLog("Running ExecNoQuery")
+
         try {
             $connection = New-Object System.Data.SqlClient.SqlConnection
             $connection.ConnectionString = $connectionString
+            $this.DebugLog("Opening database connection to $($this.ConnectionParams.database) on $($this.ConnectionParams.server)")
             $connection.Open()
 
             $command = $connection.CreateCommand()
             $command.CommandText = $sqlCommand
+            $this.DebugLog("Executing command: $sqlCommand")
             $rowsAffected = $command.ExecuteNonQuery()
 
-            $this.Logger.Info("SQL ExecNonQuery completed. Rows affected: $rowsAffected")
+            $this.DebugLog("SQL ExecNonQuery completed. Rows affected: $rowsAffected")
         }
         catch {
             $this.Logger.Error("SQL ExecNonQuery error: $_")

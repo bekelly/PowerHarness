@@ -86,7 +86,7 @@ class PowerHarness {
         #------------------------------------------------------------------------------------------
         $this.Logger = [phLogger]::new($cfg.logger)
         $this.Emailer = [phEmailer]::new($cfg.emailer)
-        $this.SQL = [phSQL]::new($this.Logger)
+        $this.SQL = [phSQL]::new($cfg.sql, $this.Logger)
 
         #------------------------------------------------------------------------------------------
         # welcome everyone
