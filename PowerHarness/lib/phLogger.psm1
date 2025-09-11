@@ -118,19 +118,34 @@ class phLogger {
         return $this.HtmlLog.ToString()
     }
 
-    [void] IndentIncrease([string]$indentStr = "") {
+    [void] IndentIncrease() {
         $this.IndentLevel++
+    }
+
+    [void] IndentIncrease([string]$indentStr) {
+        $this.IndentIncrease()
         if ($indentStr -ne "") {
             $this.SetIndentStr($indentStr)
         }
     }
 
-    [void] IndentDecrease([string]$indentStr = "") {
+    [void] IndentDecrease() {
         if ($this.IndentLevel -gt 0) {
             $this.IndentLevel--
         }
+    }
+
+    [void] IndentDecrease([string]$indentStr) {
+        $this.IndentDecrease()
         if ($indentStr -ne "") {
             $this.SetIndentStr($indentStr)
+        }
+    }
+
+    [void] IndentDecrease([bool]$resetIndent = $false) {
+        $this.IndentDecrease()
+        if ($resetIndent) {
+            $this.ResetIndentStr()
         }
     }
 
