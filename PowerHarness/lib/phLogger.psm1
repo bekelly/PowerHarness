@@ -118,13 +118,19 @@ class phLogger {
         return $this.HtmlLog.ToString()
     }
 
-    [void] IndentIncrease() {
+    [void] IndentIncrease([string]$indentStr = "") {
         $this.IndentLevel++
+        if ($indentStr -ne "") {
+            $this.SetIndentStr($indentStr)
+        }
     }
 
-    [void] IndentDecrease() {
+    [void] IndentDecrease([string]$indentStr = "") {
         if ($this.IndentLevel -gt 0) {
             $this.IndentLevel--
+        }
+        if ($indentStr -ne "") {
+            $this.SetIndentStr($indentStr)
         }
     }
 
@@ -132,7 +138,7 @@ class phLogger {
         $this.IndentStr = $str
     }
 
-    [void] ResentIndentStr() {
+    [void] ResetIndentStr() {
         $this.IndentStr = "  "
     }
 }
