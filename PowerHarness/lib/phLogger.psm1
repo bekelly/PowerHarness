@@ -52,15 +52,21 @@ class phLogger {
         # trim log if oversized
         #------------------------------------------------------------------------------------------
         if (Test-Path $this.Config.LogPath) {
-            $currentSize = (Get-Item $this.Config.LogPath).length / 1024
-            if ($currentSize -gt $this.Config.MaxSizeKB) {
-                $this.WriteToConsole("phLogger: Log file exceeds max size of $($this.Config.MaxSizeKB)KB, trimming.")
-                $lines = Get-Content $this.Config.LogPath
-                while ($currentSize -gt $this.Config.MaxSizeKB -and $lines.Count -gt 0) {
-                    $lines = $lines[1..($lines.Count - 1)]
-                    $currentSize = ($lines -join "`n").Length / 1024
-                }
-                $lines | Set-Content $this.Config.LogPath
+            $maxBytes = $this.Config.MaxSizeKB * 1024
+            $currentSize = (Get-Item $this.Config.LogPath).length
+            $this.WriteToConsole("phLogger: Current log size = $currentSize, Max Size = $maxBytes")
+            if ($currentSize -gt $maxBytes) {
+
+                $this.WriteToConsole("phLogger: Log file exceeds max size of $maxBytes KB, trimming.")
+
+                $fs = [System.IO.File]::Open($this.Config.LogPath, 'Open', 'Read', 'ReadWrite')
+                $fs.Seek(-$maxBytes, [System.IO.SeekOrigin]::End) | Out-Null
+                $reader = New-Object System.IO.StreamReader($fs)
+                $tail   = $reader.ReadToEnd()
+                $reader.Close()
+                $fs.Close()
+
+                $tail | Set-Content $this.Config.LogPath
             }
         }
     }
