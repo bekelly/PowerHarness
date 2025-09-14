@@ -28,6 +28,10 @@ class phSQL {
     }
 
     [void] ExecNonQuery([string]$sqlCommand) {
+        $this.ExecNonQuery($sqlCommand, @{})
+    }
+
+    [void] ExecNonQuery([string]$sqlCommand, [hashtable]$parameters) {
 
         $connectionString = "Server={0};Database={1};User Id={2};Password={3}" -f `
             $this.ConnectionParams.server, `
@@ -47,6 +51,12 @@ class phSQL {
 
             $command = $connection.CreateCommand()
             $command.CommandText = $sqlCommand
+
+            foreach ($key in $parameters.Keys) {
+                $param = $command.Parameters.Add("@$key", [System.Data.SqlDbType]::VarChar)
+                $param.Value = $parameters[$key]
+            }
+
             $this.DebugLog("Executing command: $sqlCommand")
             $rowsAffected = $command.ExecuteNonQuery()
 
