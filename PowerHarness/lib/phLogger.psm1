@@ -4,6 +4,7 @@ class phLogger {
     [PSCustomObject]$Config
     [int]$ErrorCount = 0
     [System.Text.StringBuilder]$HtmlLog
+    [System.Text.StringBuilder]$LogContent
     [int]$IndentLevel = 0
     [string]$IndentStr = "  "
 
@@ -21,6 +22,7 @@ class phLogger {
         #------------------------------------------------------------------------------------------
         $this.Config = $config
         $this.HtmlLog = [System.Text.StringBuilder]::new()
+        $this.LogContent = [System.Text.StringBuilder]::new()
 
         #------------------------------------------------------------------------------------------
         # log configuration values (if enabled)
@@ -29,6 +31,7 @@ class phLogger {
         $this.WriteToConsole("phLogger: Debug Enabled = $($this.Config.DebugEnabled)")
         $this.WriteToConsole("phLogger: File Logging Enabled = $($this.Config.fileLogEnabled)")
         $this.WriteToConsole("phLogger: Console Logging Enabled = $($this.Config.consoleLogEnabled)")
+        $this.WriteToConsole("phLogger: Database Logging Enabled = $($this.Config.databaseLogEnabled)")
 
         #------------------------------------------------------------------------------------------
         # detect if LogPath is relative
@@ -93,12 +96,15 @@ class phLogger {
 
             # File output
             if ($this.Config.fileLogEnabled) {
-            Add-Content -Path $this.Config.LogPath -Value $logLine
+                Add-Content -Path $this.Config.LogPath -Value $logLine
             }
 
             # HTML log accumulation
             $escaped = [System.Net.WebUtility]::HtmlEncode($logLine)
             $this.HtmlLog.AppendLine("<div class='log-$($Level.ToLower())'>$escaped</div>") | Out-Null
+
+            # regular log accumulation
+            $this.LogContent.AppendLine($logLine)
         }
 
         if ($Level -eq 'ERROR') {
@@ -122,6 +128,10 @@ class phLogger {
 
     [string] GetHtmlLog() {
         return $this.HtmlLog.ToString()
+    }
+
+    [string] GetLogContent() {
+        return $this.LogContent.ToString()
     }
 
     [void] IndentIncrease() {
