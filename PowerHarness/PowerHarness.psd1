@@ -1,7 +1,7 @@
 @{
     # Core module info
     RootModule        = 'PowerHarness.psm1'
-    ModuleVersion = '25.9.42'
+    ModuleVersion = '25.9.48'
     GUID              = 'd3c1a9e2-1234-4b56-89ab-abcdef123456'
     Author            = 'Brian Kelly'
     CompanyName       = 'Bayshore Records'
