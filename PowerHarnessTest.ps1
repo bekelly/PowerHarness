@@ -19,8 +19,7 @@ $ph.RunScript({
         $ph.Logger.Info("This is a more indented info message.`nIt's also a log statement with multiple lines.`nLine 3.`nLine 4.")
         $ph.Logger.IndentDecrease()
         $ph.Logger.Info("Back to previous indent level.")
-        $ph.Logger.IndentDecrease()
-        $ph.Logger.Error("This is a sample error message")
+        $ph.Logger.IndentDecrease($true)
     }
 
     #----------------------------------------------------------------------------------------------
@@ -29,12 +28,19 @@ $ph.RunScript({
     if ($ph.Config.sqlTestEnabled) {
         $ph.SQL.SetConnection($ph.Config.sqlConnection)
         $accountList = $ph.SQL.ExecReaderToHtmlTable("SELECT * FROM dbo.Account")
-        $accountList = $ph.SQL.ExecNonQuery("SELECT * FROM dbo.Account")
+        # $accountList = $ph.SQL.ExecNonQuery("SELECT * FROM dbo.Account")
         $ph.Logger.Debug($accountList)
         $body = $ph.emailer.ApplyDefaultTemplate($accountList)
         $ph.Logger.Debug($body)
         Write-Host $body
         $ph.Emailer.Send("Test email from PowerHarness", $body, $ph.Config.notifyEmail)
+    }
+
+    #----------------------------------------------------------------------------------------------
+    # error test -- in case we want to test error handling, error emails, etc.
+    #----------------------------------------------------------------------------------------------
+    if ($ph.Config.errorTestEnabled) {
+        $ph.Logger.Error("A FAUX ERROR HAS OCCURRED.")
     }
 
 })
