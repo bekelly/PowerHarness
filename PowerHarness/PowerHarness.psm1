@@ -57,14 +57,16 @@ class PowerHarness {
         #------------------------------------------------------------------------------------------
         if (Test-Path $defaultConfigPath) {
             $defaultCfg = Get-Content $defaultConfigPath | ConvertFrom-Json
-        } else {
+        }
+        else {
             Write-Host "Default config file not found at $defaultConfigPath, loading empty defaults."
             $defaultCfg = [PSCustomObject]@{}
         }
 
         if (Test-Path $configPath) {
             $scriptConfig = Get-Content $configPath | ConvertFrom-Json
-        } else {
+        }
+        else {
             Write-Host "Config file not found at $configPath, loading defaults."
             $scriptConfig = [PSCustomObject]@{}
         }
@@ -86,7 +88,7 @@ class PowerHarness {
         #------------------------------------------------------------------------------------------
         $this.Logger = [phLogger]::new($cfg.logger)
         $this.Emailer = [phEmailer]::new($cfg.emailer)
-        $this.SQL = [phSQL]::new($cfg.sql, $this.Logger)
+        $this.SQL = [phSQL]::new($cfg.sql, $this.Logger, $this.Util)
 
         #------------------------------------------------------------------------------------------
         # welcome everyone
@@ -111,7 +113,8 @@ class PowerHarness {
         try {
             & $MainFunction
             $this.Logger.Info("Script completed successfully.")
-        } catch {
+        }
+        catch {
             $this.Logger.Error("Exception running main function: $_")
         }
 
@@ -129,14 +132,17 @@ class PowerHarness {
                     try {
                         $this.Emailer.Send($subject, $body, $to)
                         $this.Logger.Info("Error notification sent to $to.")
-                    } catch {
+                    }
+                    catch {
                         $this.Logger.Info("Failed to send error notification: $_")
                     }
-                } else {
+                }
+                else {
                     $this.Logger.Info("No notifyEmail configured, skipping error notification.")
                 }
             }
-        } else {
+        }
+        else {
             $this.Logger.Info("Error notifications are disabled for this script.")
         }
 
@@ -166,7 +172,8 @@ class PowerHarness {
         try {
             $moduleInfo = Get-InstalledModule PowerHarness -ErrorAction Stop
             $version = $moduleInfo.Version
-        } catch {
+        }
+        catch {
             try {
                 $psd1Path = Join-Path $PSScriptRoot "PowerHarness.psd1"
                 if (Test-Path $psd1Path) {
@@ -174,17 +181,20 @@ class PowerHarness {
                         $psd1Content = Get-Content $psd1Path -Raw
                         if ($psd1Content -match "ModuleVersion\s*=\s*'([^']+)'") {
                             $version = $matches[1]
-                        } else {
+                        }
+                        else {
                             $version = "Unknown Version"
                         }
-                    } catch {
+                    }
+                    catch {
                         $version = "Unknown Version"
                     }
                 }
                 else {
                     $version = "Unknown Version"
                 }
-            } catch {
+            }
+            catch {
                 $version = "Unknown Version"
             }
         }

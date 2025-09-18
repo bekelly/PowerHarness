@@ -1,24 +1,51 @@
 using module '.\phLogger.psm1'
+using module '.\phUtil.psm1'
 $ErrorActionPreference = 'Stop'
 
 class phSQL {
     [phLogger]       $Logger
+    [phUtil]         $Util
     [PSCustomObject] $Config
     [PSCustomObject] $ConnectionParams
 
-    phSQL([PSCustomObject]$config, [phLogger]$logger){
+    #----------------------------------------------------------------------------------------------
+    # constructor
+    #----------------------------------------------------------------------------------------------
+    phSQL([PSCustomObject]$config, [phLogger]$logger, [phUtil]$util) {
         $this.Config = $config
         $this.Logger = $logger
+        $this.Util = $util
     }
 
-    [void] SetConnection([PSCustomObject]$connectionParams){
+    #----------------------------------------------------------------------------------------------
+    # SetConnection
+    #----------------------------------------------------------------------------------------------
+    [void] SetConnection([PSCustomObject]$connectionParams) {
+
+        #------------------------------------------------------------------------------------------
+        # set default values on the connection so we can use them everywhere
+        #------------------------------------------------------------------------------------------
+        $this.Logger.Debug("Entered SetConnection")
+        $this.Util.EnsureDefaults($connectionParams, @{
+                connectionRetries = 3
+                sleepSeconds      = 5
+            })
+
+        #------------------------------------------------------------------------------------------
+        # make this our current connection
+        #------------------------------------------------------------------------------------------
         $this.ConnectionParams = $connectionParams
+
+        #------------------------------------------------------------------------------------------
+        # log the parameters
+        #------------------------------------------------------------------------------------------
         $this.DebugLog("SetConnection:")
         $this.DebugLog("Server Name: $($this.ConnectionParams.server)")
         $this.DebugLog("   Database: $($this.ConnectionParams.database)")
         $this.DebugLog("   Username: $($this.ConnectionParams.username)")
         $masked = '*' * ($this.ConnectionParams.password.Length)
         $this.DebugLog("   Password: $masked")
+
     }
 
     hidden [void] DebugLog([string]$message) {
@@ -31,7 +58,7 @@ class phSQL {
         $this.ExecNonQuery($sqlCommand, @{})
     }
 
-    [void] ExecNonQuery([string]$sqlCommand, [hashtable]$parameters) {
+    hidden [System.Data.SqlClient.SqlConnection] ConnectWithRetry() {
 
         $connectionString = "Server={0};Database={1};User Id={2};Password={3}" -f `
             $this.ConnectionParams.server, `
@@ -39,15 +66,38 @@ class phSQL {
             $this.ConnectionParams.username, `
             $this.ConnectionParams.password
 
-        $connection = $null
+        $connection = New-Object System.Data.SqlClient.SqlConnection
+
+        $connection.ConnectionString = $connectionString
+
+        for ($i = 1; $i -le $this.ConnectionParams.connectionRetries; $i++) {
+            try {
+                $this.DebugLog("Attempt ${i}: Opening database connection to $($connection.Database) on $($connection.DataSource)")
+                $connection.Open()
+                return $connection
+            }
+            catch {
+                $this.DebugLog("SQL connection attempt $i failed: $_")
+                if ($i -lt $this.ConnectionParams.connectionRetries) {
+                    Start-Sleep -Seconds $this.ConnectionParams.sleepSeconds
+                }
+                else {
+                    throw "SQL connection failed after $($this.ConnectionParams.connectionRetries) attempts."
+                }
+            }
+        }
+
+        return null
+    }
+
+    [void] ExecNonQuery([string]$sqlCommand, [hashtable]$parameters) {
 
         $this.DebugLog("Running ExecNoQuery")
+        $connection = $null
 
         try {
-            $connection = New-Object System.Data.SqlClient.SqlConnection
-            $connection.ConnectionString = $connectionString
             $this.DebugLog("Opening database connection to $($this.ConnectionParams.database) on $($this.ConnectionParams.server)")
-            $connection.Open()
+            $connection = $this.ConnectWithRetry()
 
             $command = $connection.CreateCommand()
             $command.CommandText = $sqlCommand
@@ -75,18 +125,11 @@ class phSQL {
 
     [System.Data.DataTable] ExecReaderToDataTable([string]$sqlCommand) {
 
-        $connectionString = "Server={0};Database={1};User Id={2};Password={3}" -f `
-            $this.ConnectionParams.server, `
-            $this.ConnectionParams.database, `
-            $this.ConnectionParams.username, `
-            $this.ConnectionParams.password
         $connection = $null
         $dataTable = $null
 
         try {
-            $connection = New-Object System.Data.SqlClient.SqlConnection
-            $connection.ConnectionString = $connectionString
-            $connection.Open()
+            $connection = $this.ConnectWithRetry()
 
             # Running the query
             $command = $connection.CreateCommand()
