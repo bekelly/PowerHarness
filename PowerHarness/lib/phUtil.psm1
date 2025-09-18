@@ -10,7 +10,7 @@ class phUtil {
     #----------------------------------------------------------------------------------------------
     [PSCustomObject] MergeJsonObjects([PSCustomObject]$Default, [PSCustomObject]$Override) {
         foreach ($prop in $Override.PSObject.Properties) {
-            $name  = $prop.Name
+            $name = $prop.Name
             $value = $prop.Value
 
             if ($Default.PSObject.Properties.Name -contains $name) {
@@ -38,7 +38,7 @@ class phUtil {
     # Moves files and folders older than $daysOld from $sourceDirectory to $archiveDirectory.
     #----------------------------------------------------------------------------------------------
     [string] ArchiveFilesByDate ([string]$sourceDirectory, [string]$archiveDirectory, [int]$daysOld = 30) {
-    
+
         # this is a quick-and-dirty function that Copilot wrote for me.  I'm *sure* it could be cleaner
 
         $cutoffDate = (Get-Date).AddDays(-$daysOld)
@@ -115,12 +115,13 @@ class phUtil {
         if ($RequiredVersion) {
             # Check for exact version
             $installed = Get-Module -ListAvailable -Name $ModuleName |
-                Where-Object { $_.Version -eq [version]$RequiredVersion }
+            Where-Object { $_.Version -eq [version]$RequiredVersion }
 
             if (-not $installed) {
                 Install-Module -Name $ModuleName -RequiredVersion $RequiredVersion -Scope CurrentUser -Force -Confirm:$false
             }
-        } else {
+        }
+        else {
             # Check if *any* version is installed
             $installed = Get-Module -ListAvailable -Name $ModuleName
 
@@ -133,7 +134,7 @@ class phUtil {
 
     [void] LogObject ([PSCustomObject]$obj, [PSCustomObject]$logger) {
 
-        if ($null -eq $logger) { 
+        if ($null -eq $logger) {
             Write-Host "Logger is NULL" -ForegroundColor Red
             return
         }
@@ -149,24 +150,45 @@ class phUtil {
                 $logger.IndentIncrease()
                 $this.LogObject($property.Value, $logger)
                 $logger.IndentDecrease()
-            } elseif ($property.Value -is [System.Collections.IEnumerable] -and -not ($property.Value -is [string])) {
+            }
+            elseif ($property.Value -is [System.Collections.IEnumerable] -and -not ($property.Value -is [string])) {
                 $logger.Info("$($property.Name):")
                 $logger.IndentIncrease()
                 foreach ($item in $property.Value) {
                     if ($item -is [PSCustomObject] -or $item -is [hashtable]) {
                         $this.LogObject($item, $logger)
-                    } else {
+                    }
+                    else {
                         $logger.Info("$item")
                     }
                 }
                 $logger.IndentDecrease()
-            } else {
+            }
+            else {
                 $value = $property.Value
                 if ($property.Name -in @('password', 'apiKey')) {
                     $value = '*' * ($property.Value.ToString().Length)
                 }
                 $logger.Info("$($property.Name): $value")
             }
+        }
+    }
+
+    [void] EnsureProperty([PSCustomObject]$object, [string]$propertyName, [object]$defaultValue) {
+        Write-Host " - Ensuring property '$propertyName'..." -ForegroundColor Yellow
+        if (-not ($object.PSObject.Properties.Name -contains $propertyName)) {
+            Add-Member -InputObject $object -MemberType NoteProperty -Name $propertyName -Value $defaultValue
+        }
+        elseif ($null -eq $object.$propertyName) {
+            $object.$propertyName = $defaultValue
+        }
+    }
+
+    [void] EnsureDefaults([PSCustomObject]$object, [hashtable]$defaults) {
+        Write-Host "Ensuring defaults..." -ForegroundColor Yellow
+        foreach ($key in $defaults.Keys) {
+            Write-Host " - Ensuring property '$key'..." -ForegroundColor Yellow
+            $this.EnsureProperty($object, $key, $defaults[$key])
         }
     }
 
