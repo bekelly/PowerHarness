@@ -4,8 +4,6 @@ param (
     [string]$ScriptToRun
 )
 
-Write-Output "Resetting PowerHarness module"
-Remove-Module PowerHarness -Force -ErrorAction SilentlyContinue
-
-Write-Output "Launching script: $ScriptToRun"
-. $ScriptToRun
+Write-Host "Debug Harness Launching script: $ScriptToRun" -ForegroundColor White -BackgroundColor DarkGreen
+# . $ScriptToRun
+Start-Process powershell -ArgumentList "-NoExit", "-File", $ScriptToRun
