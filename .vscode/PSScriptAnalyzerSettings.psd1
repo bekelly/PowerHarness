@@ -1,7 +1,10 @@
 @{
     Rules = @{
-        TypeNotFound = @{
+        TypeNotFound          = @{
             Severity = 'Ignore'
+        }
+        PSAvoidUsingWriteHost = @{
+            Severity = 'None'
         }
     }
 }
