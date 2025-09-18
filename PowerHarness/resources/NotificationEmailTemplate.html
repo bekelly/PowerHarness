@@ -1,50 +1,56 @@
 <html>
-    <head>
-        <title>Email Notification</title>
-        <style type='text/css'>
-            .code
-            {
-                background-color: #f5f5f5; /* Light grey background */
-                border: 1px solid #ddd;    /* Slight border */
-                border-radius: 5px;        /* Rounded corners */
-                padding: 10px;             /* Some padding */
-                overflow-x: auto;
-                font-family: 'Courier New', Courier, monospace; /* Monospaced font */
-                font-size: 14px;           /* Font size */
-                color: #333;               /* Text color */
-            }
-            
-            .announce
-            {
-                font-family: Aptos, Helvetica, Calibri;
-                font-size: 12pt;
-                font-weight: bold;
-            }
 
-            .sqltable
-            {
-                width: 100%;
-                border-collapse: collapse;
-                font-size: 10pt;
-                font-family: Aptos, Arial, sans-serif;
-            }
+<head>
+    <title>Email Notification</title>
+    <style type='text/css'>
+        .code {
+            background-color: #f5f5f5;
+            /* Light grey background */
+            border: 1px solid #ddd;
+            /* Slight border */
+            border-radius: 5px;
+            /* Rounded corners */
+            padding: 10px;
+            /* Some padding */
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            /* Monospaced font */
+            font-size: 14px;
+            /* Font size */
+            color: #333;
+            /* Text color */
+        }
 
-            .log-info
-            {
-                color: #000000;
-            }
-            .log-error
-            {
-                color: #F44336;
-                font-weight: bold;
-            }
-            .log-debug
-            {
-                color: #505050;
-            }
-        </style>
-    </head>
-    <body>
-        %message%
-    </body>
+        .announce {
+            font-family: Aptos, Helvetica, Calibri;
+            font-size: 12pt;
+            font-weight: bold;
+        }
+
+        .sqltable {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+            font-family: Aptos, Arial, sans-serif;
+        }
+
+        .log-info {
+            color: #000000;
+        }
+
+        .log-error {
+            color: #F44336;
+            font-weight: bold;
+        }
+
+        .log-debug {
+            color: #1c547e;
+        }
+    </style>
+</head>
+
+<body>
+    %message%
+</body>
+
 </html>
