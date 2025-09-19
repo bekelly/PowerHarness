@@ -175,7 +175,6 @@ class phUtil {
     }
 
     [void] EnsureProperty([PSCustomObject]$object, [string]$propertyName, [object]$defaultValue) {
-        Write-Host " - Ensuring property '$propertyName'..." -ForegroundColor Yellow
         if (-not ($object.PSObject.Properties.Name -contains $propertyName)) {
             Add-Member -InputObject $object -MemberType NoteProperty -Name $propertyName -Value $defaultValue
         }
@@ -185,9 +184,7 @@ class phUtil {
     }
 
     [void] EnsureDefaults([PSCustomObject]$object, [hashtable]$defaults) {
-        Write-Host "Ensuring defaults..." -ForegroundColor Yellow
         foreach ($key in $defaults.Keys) {
-            Write-Host " - Ensuring property '$key'..." -ForegroundColor Yellow
             $this.EnsureProperty($object, $key, $defaults[$key])
         }
     }
