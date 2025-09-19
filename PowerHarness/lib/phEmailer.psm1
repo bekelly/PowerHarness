@@ -64,7 +64,7 @@ class phEmailer {
     }
 
     [string] ApplyDefaultTemplate([string]$bodyContent) {
-        $templatePath = Join-Path $PSScriptRoot "../resources/NotificationEmailTemplate.html"
+        $templatePath = Join-Path $PSScriptRoot "../resources/EmailTemplate.html"
         return $this.ApplyTemplate($templatePath, @{ message = $bodyContent })
     }
 }
