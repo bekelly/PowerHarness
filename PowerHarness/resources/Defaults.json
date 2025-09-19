@@ -1,0 +1,31 @@
+{
+    "zipToolPath": "",
+    "errorNotificationEnabled": false,
+    "notifyEmail": "",
+    "logConfiguration": false,
+    "sql": {
+        "debugLogEnabled": false
+    },
+    "emailer": {
+        "smtpServer": "",
+        "smtpPort": 587,
+        "username": "",
+        "password": "",
+        "fromEmail": "",
+        "fromName": ""
+    },
+    "logger": {
+        "maxSizeKB": 512,
+        "fileLogEnabled": true,
+        "consoleLogEnabled": true,
+        "debugEnabled": false,
+        "writeConfigToConsole": false,
+        "databaseLogEnabled": false,
+        "logDatabase": {
+            "server": "",
+            "database": "",
+            "username": "",
+            "password": ""
+        }
+    }
+}

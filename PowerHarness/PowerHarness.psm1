@@ -48,47 +48,20 @@ class PowerHarness {
         # get paths all set up
         #------------------------------------------------------------------------------------------
         $baseName = [System.IO.Path]::GetFileNameWithoutExtension($this.ScriptName)
-        $defaultConfigPath = Join-Path $this.ScriptRoot "cfg/PowerHarnessDefaults.json"
-        $configPath = Join-Path $this.ScriptRoot "cfg/${baseName}.json"
+
         $logPath = Join-Path $this.ScriptRoot "log/${baseName}.log"
 
         #------------------------------------------------------------------------------------------
         # load configuration
         #------------------------------------------------------------------------------------------
-        if (Test-Path $defaultConfigPath) {
-            $defaultCfg = Get-Content $defaultConfigPath | ConvertFrom-Json
-        }
-        else {
-            Write-Host "Default config file not found at $defaultConfigPath, loading empty defaults."
-            $defaultCfg = [PSCustomObject]@{}
-        }
-
-        if (Test-Path $configPath) {
-            $scriptConfig = Get-Content $configPath | ConvertFrom-Json
-        }
-        else {
-            Write-Host "Config file not found at $configPath, loading defaults."
-            $scriptConfig = [PSCustomObject]@{}
-        }
-
-        $cfg = $this.Util.MergeJsonObjects($defaultCfg, $scriptConfig)
-
-        if (-not $cfg.logger.logPath) {
-            $cfg.logger | Add-Member -MemberType NoteProperty -Name logPath -Value $logPath
-        }
-
-        if (-not ($cfg -is [psobject])) {
-            $cfg = $cfg | ConvertTo-Json | ConvertFrom-Json
-        }
-
-        $this.Config = $cfg
+        $this.Config = $this.GetConfig($baseName, $logPath)
 
         #------------------------------------------------------------------------------------------
         # initialize subsystems
         #------------------------------------------------------------------------------------------
-        $this.Logger = [phLogger]::new($cfg.logger)
-        $this.Emailer = [phEmailer]::new($cfg.emailer)
-        $this.SQL = [phSQL]::new($cfg.sql, $this.Logger, $this.Util)
+        $this.Logger = [phLogger]::new($this.Config.logger)
+        $this.Emailer = [phEmailer]::new($this.Config.emailer)
+        $this.SQL = [phSQL]::new($this.Config.sql, $this.Logger, $this.Util)
 
         #------------------------------------------------------------------------------------------
         # welcome everyone
@@ -201,6 +174,55 @@ class PowerHarness {
 
         return $version
 
+    }
+
+    #----------------------------------------------------------------------------------------------
+    # GetConfig
+    #----------------------------------------------------------------------------------------------
+    Hidden [PSCustomObject] GetConfig([string]$basename, [string]$logPath) {
+
+        #------------------------------------------------------------------------------------------
+        # get paths all set up
+        #------------------------------------------------------------------------------------------
+        $systemDefaultsPath = Join-Path $PSScriptRoot "resources/Defaults.json"
+        $userDefaultsPath = Join-Path $this.ScriptRoot "cfg/Defaults.json"
+        $configPath = Join-Path $this.ScriptRoot "cfg/${baseName}.json"
+
+        #------------------------------------------------------------------------------------------
+        # we've got to return something, so let's at least make sure we have something to return
+        #------------------------------------------------------------------------------------------
+        $systemDefaultCfg = [PSCustomObject]@{}
+        $userDefaultCfg = [PSCustomObject]@{}
+        $scriptCfg = [PSCustomObject]@{}
+        $finalCfg = [PSCustomObject]@{}
+
+        #------------------------------------------------------------------------------------------
+        # load system defaults
+        #------------------------------------------------------------------------------------------
+        if (Test-Path $systemDefaultsPath) {
+            $systemDefaultCfg = Get-Content $systemDefaultsPath | ConvertFrom-Json
+        }
+
+        if (Test-Path $userDefaultsPath) {
+            $userDefaultCfg = Get-Content $userDefaultsPath | ConvertFrom-Json
+        }
+
+        if (Test-Path $configPath) {
+            $scriptCfg = Get-Content $configPath | ConvertFrom-Json
+        }
+
+        $finalCfg = $this.Util.MergeJsonObjects($systemDefaultCfg, $userDefaultCfg)
+        $finalCfg = $this.Util.MergeJsonObjects($finalCfg, $scriptCfg)
+
+        if (-not $finalCfg.logger.logPath) {
+            $finalCfg.logger | Add-Member -MemberType NoteProperty -Name logPath -Value $logPath
+        }
+
+        if (-not ($finalCfg -is [psobject])) {
+            $finalCfg = $finalCfg | ConvertTo-Json | ConvertFrom-Json
+        }
+
+        return $finalCfg
     }
 }
 
