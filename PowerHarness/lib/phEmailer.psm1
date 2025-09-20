@@ -1,8 +1,10 @@
+using module '.\phEmailTemplater.psm1'
 $ErrorActionPreference = 'Stop'
 
 class phEmailer {
     [System.Net.Mail.SmtpClient] $SmtpClient
     [System.Net.Mail.MailAddress] $FromAddress
+    [phEmailTemplater] $Templater = [phEmailTemplater]::new()
 
     phEmailer([PSCustomObject]$config) {
         $this.SmtpClient = [System.Net.Mail.SmtpClient]::new($config.smtpServer, $config.smtpPort)
@@ -33,38 +35,13 @@ class phEmailer {
         $this.Send($Subject, $Body, $ToAddress, @())
     }
 
-    [string] ApplyTemplate([string]$templatePath, [hashtable]$placeholders) {
-
-        #------------------------------------------------------------------------------------------
-        # validate the template path
-        #------------------------------------------------------------------------------------------
-        if (-not (Test-Path $templatePath)) {
-            throw "Template file not found: $templatePath"
-        }
-
-        #------------------------------------------------------------------------------------------
-        # load the file
-        #------------------------------------------------------------------------------------------
-        $templateContent = Get-Content -Path $templatePath -Raw
-
-        #------------------------------------------------------------------------------------------
-        # do the replacements
-        #------------------------------------------------------------------------------------------
-        foreach ($key in $placeholders.Keys) {
-            $placeholder = "%$key%"
-            $value = $placeholders[$key]
-            $templateContent = $templateContent.Replace($placeholder, $value)
-        }
-
-        #------------------------------------------------------------------------------------------
-        # give 'em what we've got
-        #------------------------------------------------------------------------------------------
-        return $templateContent
-
+    [void] SendFromTemplate([string]$subject, [string]$toAddress, [string[]]$ccAddresses) {
+        $body = $this.Templater.GetBody()
+        $this.Send($subject, $body, $toAddress, $ccAddresses)
     }
 
-    [string] ApplyDefaultTemplate([string]$bodyContent) {
-        $templatePath = Join-Path $PSScriptRoot "../resources/EmailTemplate.html"
-        return $this.ApplyTemplate($templatePath, @{ message = $bodyContent })
+    [void] SendFromTemplate([string]$subject, [string]$toAddress) {
+        $this.SendFromTemplate($subject, $toAddress, @())
     }
+
 }

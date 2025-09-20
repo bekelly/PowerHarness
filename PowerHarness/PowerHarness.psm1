@@ -102,12 +102,12 @@ class PowerHarness {
             if ($this.config.errorNotificationEnabled) {
                 $logHtml = $this.Logger.GetHtmlLog()
                 $subject = "$($this.ScriptName) error report [$timestamp]"
-                $bodyContent = "<div class='code'>$logHtml</div>"
-                $body = $this.Emailer.ApplyDefaultTemplate($bodyContent)
+                $this.Emailer.Templater.Reset()
+                $this.Emailer.Templater.AddMonoBlock($logHtml)
                 $to = $this.Config.notifyEmail
                 if ($to) {
                     try {
-                        $this.Emailer.Send($subject, $body, $to)
+                        $this.Emailer.SendFromTemplate($subject, $to)
                         $this.Logger.Info("Error notification sent to $to.")
                     }
                     catch {

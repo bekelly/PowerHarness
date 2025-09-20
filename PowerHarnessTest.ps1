@@ -30,9 +30,26 @@ $ph.RunScript({
             $accountList = $ph.SQL.ExecReaderToHtmlTable("SELECT * FROM dbo.Account")
             # $accountList = $ph.SQL.ExecNonQuery("SELECT * FROM dbo.Account")
             # $ph.Logger.Debug($accountList)
-            $body = $ph.emailer.ApplyDefaultTemplate($accountList)
+            $body = $ph.Emailer.Templater.Reset().AddPlain($accountList)
             $ph.Logger.Debug($body)
             # $ph.Emailer.Send("Test email from PowerHarness", $body, $ph.Config.notifyEmail)
+        }
+
+        #----------------------------------------------------------------------------------------------
+        # emailer test
+        #----------------------------------------------------------------------------------------------
+        if ($ph.Config.emailTestEnabled) {
+            $ph.Logger.Info("Sending test email to $($ph.Config.notifyEmail)")
+
+            $ph.Emailer.Templater.Reset(). `
+                AddTitle("PowerHarness Test Email"). `
+                AddTitleChipGreen("Title Chip Green"). `
+                AddTitleChipRed("Title Chip Red"). `
+                AddPlain("This is a plain text paragraph."). `
+                AddCode("SELECT * FROM dbo.Account;"). `
+                AddMonoBlock("This is a mono block of text.`nIt can have multiple lines.`nLine 3.`nLine 4.")
+
+            $ph.Emailer.SendFromTemplate("Test email from PowerHarness", $ph.Config.notifyEmail)
         }
 
         #----------------------------------------------------------------------------------------------
@@ -41,5 +58,10 @@ $ph.RunScript({
         if ($ph.Config.errorTestEnabled) {
             $ph.Logger.Error("A FAUX ERROR HAS OCCURRED.")
         }
+
+        #----------------------------------------------------------------------------------------------
+        # let 'em know we're all done
+        #----------------------------------------------------------------------------------------------
+        $ph.Logger.Info("All tests completed.")
 
     })
