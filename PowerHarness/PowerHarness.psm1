@@ -98,8 +98,8 @@ class PowerHarness {
         #------------------------------------------------------------------------------------------
         # check for errors and send notification if enabled
         #------------------------------------------------------------------------------------------
-        if ($this.config.errorNotificationEnabled) {
-            if ($this.Logger.ErrorCount -gt 0) {
+        if ($this.Logger.ErrorCount -gt 0) {
+            if ($this.config.errorNotificationEnabled) {
                 $logHtml = $this.Logger.GetHtmlLog()
                 $subject = "$($this.ScriptName) error report [$timestamp]"
                 $bodyContent = "<div class='code'>$logHtml</div>"
@@ -118,9 +118,9 @@ class PowerHarness {
                     $this.Logger.Info("No notifyEmail configured, skipping error notification.")
                 }
             }
-        }
-        else {
-            $this.Logger.Info("Error notifications are disabled for this script.")
+            else {
+                $this.Logger.Info("Error notifications are disabled for this script.")
+            }
         }
 
         #------------------------------------------------------------------------------------------
