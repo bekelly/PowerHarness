@@ -40,13 +40,17 @@ class phEmailTemplater {
         return $this.AddHtml("<h1 class='title-chip-red'>{content}</h1><br />", $content)
     }
 
-    [phEmailTemplater] AddCode([string]$content) {
+    [phEmailTemplater] AddCode([string]$lang, [string]$content) {
         # we will add syntax highlighting in the next phase
         return $this.AddHtml("<pre class='code'><code>{content}</code></pre>", $content)
     }
 
     [phEmailTemplater] AddMonoBlock([string]$content) {
         return $this.AddHtml("<pre class='code'><code>{content}</code></pre>", $content)
+    }
+
+    [phEmailTemplater] AddTable([string]$htmlTable) {
+        return $this.AddHtml("<div class='table-container'>{content}</div>", $htmlTable)
     }
 
     [phEmailTemplater] AddPlain([string]$content) {
