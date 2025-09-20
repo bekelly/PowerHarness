@@ -122,14 +122,16 @@ class PowerHarness {
         #------------------------------------------------------------------------------------------
         # if the boss wants us to write the log to the database, we can try...?
         #------------------------------------------------------------------------------------------
-        try {
-            $sqlCommand = "EXEC WriteLogRecord @ScriptName, @LogContent;"
-            $params = @{ScriptName = $this.ScriptName; LogContent = $this.Logger.GetLogContent() }
-            $this.SQL.SetConnection($this.Config.Logger.logDatabase)
-            $this.SQL.ExecNonQuery($sqlCommand, $params)
-        }
-        catch {
-            $this.Logger.Error("Error writing log to database: $_")
+        if ($this.Config.logger.logToDatabase) {
+            try {
+                $sqlCommand = "EXEC WriteLogRecord @ScriptName, @LogContent;"
+                $params = @{ScriptName = $this.ScriptName; LogContent = $this.Logger.GetLogContent() }
+                $this.SQL.SetConnection($this.Config.Logger.logDatabase)
+                $this.SQL.ExecNonQuery($sqlCommand, $params)
+            }
+            catch {
+                $this.Logger.Error("Error writing log to database: $_")
+            }
         }
     }
 
