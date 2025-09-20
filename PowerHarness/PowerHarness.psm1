@@ -67,6 +67,10 @@ class PowerHarness {
         # welcome everyone
         #------------------------------------------------------------------------------------------
         $this.Logger.Info("====== $($this.ScriptName) - PowerHarness v$version =============================")
+        if ($this.Config.logPowerShellVersion) {
+            $version = (Get-Variable -Name PSVersionTable -Scope Global).Value.PSVersion.ToString()
+            $this.Logger.Info("PowerShell version: $version")
+        }
 
         #------------------------------------------------------------------------------------------
         # if we're supposed to log the config, go ahead and do that now

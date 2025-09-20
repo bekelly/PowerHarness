@@ -3,6 +3,7 @@
     "errorNotificationEnabled": false,
     "notifyEmail": "",
     "logConfiguration": false,
+    "logPowerShellVersion": true,
     "sql": {
         "debugLogEnabled": false
     },
