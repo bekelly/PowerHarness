@@ -126,7 +126,8 @@ class PowerHarness {
         #------------------------------------------------------------------------------------------
         # if the boss wants us to write the log to the database, we can try...?
         #------------------------------------------------------------------------------------------
-        if ($this.Config.logger.logToDatabase) {
+        if ($this.Config.logger.databaseLogEnabled) {
+            $this.Logger.Debug("Writing log to database")
             try {
                 $sqlCommand = "EXEC WriteLogRecord @ScriptName, @LogContent;"
                 $params = @{ScriptName = $this.ScriptName; LogContent = $this.Logger.GetLogContent() }
