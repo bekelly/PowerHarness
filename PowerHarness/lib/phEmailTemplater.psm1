@@ -33,11 +33,19 @@ class phEmailTemplater {
     }
 
     [phEmailTemplater] AddTitleChipGreen([string]$content) {
-        return $this.AddHtml("<h1 class='title-chip-green'>{content}</h1><br />", $content)
+        return $this.AddHtml("<h1 class='title-chip-green'>{content}</h1>", $content)
+    }
+
+    [phEmailTemplater] AddTitleChipBlue([string]$content) {
+        return $this.AddHtml("<h1 class='title-chip-blue'>{content}</h1>", $content)
+    }
+
+    [phEmailTemplater] AddTitleChipBlack([string]$content) {
+        return $this.AddHtml("<h1 class='title-chip-black'>{content}</h1>", $content)
     }
 
     [phEmailTemplater] AddTitleChipRed([string]$content) {
-        return $this.AddHtml("<h1 class='title-chip-red'>{content}</h1><br />", $content)
+        return $this.AddHtml("<h1 class='title-chip-red'>{content}</h1>", $content)
     }
 
     [phEmailTemplater] AddCode([string]$lang, [string]$content) {
@@ -47,6 +55,10 @@ class phEmailTemplater {
 
     [phEmailTemplater] AddMonoBlock([string]$content) {
         return $this.AddHtml("<pre class='code'><code>{content}</code></pre>", $content)
+    }
+
+    [phEmailTemplater] AddLogContent([string]$content) {
+        return $this.AddHtml("<div class='code'><code>{content}</code></div>", $content)
     }
 
     [phEmailTemplater] AddTable([string]$htmlTable) {

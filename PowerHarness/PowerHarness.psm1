@@ -60,7 +60,7 @@ class PowerHarness {
         # initialize subsystems
         #------------------------------------------------------------------------------------------
         $this.Logger = [phLogger]::new($this.Config.logger)
-        $this.Emailer = [phEmailer]::new($this.Config.emailer)
+        $this.Emailer = [phEmailer]::new($this.Config.emailer, $this.Logger)
         $this.SQL = [phSQL]::new($this.Config.sql, $this.Logger, $this.Util)
 
         #------------------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ class PowerHarness {
                 $logHtml = $this.Logger.GetHtmlLog()
                 $subject = "$($this.ScriptName) error report [$timestamp]"
                 $this.Emailer.Templater.Reset()
-                $this.Emailer.Templater.AddMonoBlock($logHtml)
+                $this.Emailer.Templater.AddLogContent($logHtml)
                 $to = $this.Config.notifyEmail
                 if ($to) {
                     try {

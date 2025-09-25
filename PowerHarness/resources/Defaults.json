@@ -13,7 +13,10 @@
         "username": "",
         "password": "",
         "fromEmail": "",
-        "fromName": ""
+        "fromName": "",
+        "enableSSL": true,
+        "archiveEmail": false,
+        "archiveDaysToKeep": 30
     },
     "logger": {
         "maxSizeKB": 512,
