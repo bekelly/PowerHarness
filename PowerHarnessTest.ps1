@@ -44,6 +44,7 @@ $ph.RunScript({
             $ph.Emailer.Templater.Reset(). `
                 AddTitle("PowerHarness Test Email"). `
                 AddTitleChipBlack("Title Chip Black"). `
+                AddPlain("This is a sample of plain text that you can enjoy reading."). `
                 AddTitleChipBlue("Title Chip Blue"). `
                 AddTitleChipGreen("Title Chip Green"). `
                 AddTitleChipRed("Title Chip Red"). `
@@ -52,7 +53,8 @@ $ph.RunScript({
                 AddMonoBlock("This is a mono block of text.`nIt can have multiple lines.`nLine 3.`nLine 4."). `
                 AddTitleChipBlue("Current Log").AddLogContent($ph.Logger.GetHtmlLog())
 
-            $ph.Emailer.SendFromTemplate("Test email from PowerHarness", $ph.Config.notifyEmail)
+            $ph.Emailer.Templater.GetBody() | Out-File "$PSScriptRoot\log\PowerHarnessTestEmail.html" -Encoding utf8
+            # $ph.Emailer.SendFromTemplate("Test email from PowerHarness", $ph.Config.notifyEmail)
         }
 
         #----------------------------------------------------------------------------------------------

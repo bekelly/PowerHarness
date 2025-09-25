@@ -66,7 +66,7 @@ class phEmailTemplater {
     }
 
     [phEmailTemplater] AddPlain([string]$content) {
-        return $this.AddHtml("{content}", $content)
+        return $this.AddHtml("<div class='plain'>{content}</div>", $content)
     }
 
     [phEmailTemplater] Reset() {
